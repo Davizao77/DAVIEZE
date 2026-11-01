@@ -4155,7 +4155,7 @@ CUTS.c5cs06={dur:19000,lb:54,world:1,nofade:1,fotos:['c5_fusao','c5_lulanaro'],h
 // Dano em qualquer um (hurt) = as duas barras caem HIT, SEM perder vida. 1 jogador: o parceiro (IA) acompanha a barra do jogador. Barras cheias: "CARGA COMPLETA" e c5DpFire() (a Parte 15 troca pelo CS07b: disparo e separação).
 // O Lulanaro fica intocável (e.c5dp, vida travada em 15%) e ataca com os golpes da fase 2 (rajadas telegrafadas, esmagão etc.). Perder = não existe (só atrasar a carga); retry (rt:7) volta aqui sem repetir a conversa.
 const C5D={ZX:470,ZY:452,DX:540,DY:480,LX:800,LY:455,PZ:[300,436],PD:[360,474]};
-const C5DP={ESM:1.9,SEG:5.5,SYNC:16,HIT:30,DEC:3,GOLD:'#ffd23a',ORA:'#ff8a2a'};
+const C5DP={ESM:2.4,SEG:7.5,SYNC:20,HIT:7,DEC:2,GOLD:'#ffd23a',ORA:'#ff8a2a'};
 C5OB.depai='Esmaguem ATAQUE/PULO JUNTOS: as duas barras têm que subir iguais! Desviem dos tiros ➜';
 CUTS.c5cs07a={dur:14900,lb:54,lift:80,world:1,nofade:1,fotos:[],
  wd:u=>{if(G.lul)G.lul.y=C5D.LY+Math.sin(T*4.2)*2.5},
@@ -4178,9 +4178,9 @@ CUTS.c5cs07a={dur:14900,lb:54,lift:80,world:1,nofade:1,fotos:[],
 C5IN.depai=intro=>{G.c5dp=0;G.bsub=null;E.length=0;P.forEach(p=>{p.cp=0});P[0].x=C5D.PZ[0];P[0].y=C5D.PZ[1];P[1].x=C5D.PD[0];P[1].y=C5D.PD[1];G.bol=0;G.sgs=0;G.flv=0;AU.preC5('luta')};
 function c5DpStart(){const np=P.filter(p=>p.on).length;E.length=0;add('b7',false);const e=E[E.length-1];
  e.c5=1;e.c5dp=1;e.f2=1;e.dm=Math.round(ET.b7.dm*C5LU.DM*1.2);e.hp=e.mhp=Math.round(ET.b7.hp*C5LU.HP*(1+.35*(np-1)));e.hp=e.mhp*C5LU.HOLD;
- e.x=C5D.LX;e.y=C5D.LY;e.dir=-1;e.cd=2;e.sc=2.4;G.bt=0;G.bsub=null;
+ e.x=C5D.LX;e.y=C5D.LY;e.dir=-1;e.cd=2.6;e.sc=3.6;G.bt=0;G.bsub=null;
  G.c5dp={on:1,b:[0,0],t:0,hint:7,pen:0,hit:0,fin:0,fired:0,idle:[0,0],e,sf:0}}
-function c5DpHurt(p,kx){const d=G.c5dp;p.t.inv=Math.max(p.t.inv,.9);p.t.hurt=.25;p.kx=kx;G.sh=Math.max(G.sh||0,8);G.hs=.05;
+function c5DpHurt(p,kx){const d=G.c5dp;p.t.inv=Math.max(p.t.inv,1.6);p.t.hurt=.25;p.kx=kx;G.sh=Math.max(G.sh||0,8);G.hs=.05;
  if(d.fin)return;d.b[0]=Math.max(0,d.b[0]-C5DP.HIT);d.b[1]=Math.max(0,d.b[1]-C5DP.HIT);d.hit=.55;
  txt(p.x,p.y-90,'A CARGA CAIU!','#ff5a5a');sx('sfx_dano_player',{vol:.8,gap:100},()=>snd(100,.1,'sawtooth'))}
 C5TK.depai=dt=>{
