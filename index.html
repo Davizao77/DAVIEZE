@@ -1509,7 +1509,7 @@ addEventListener('keydown',e=>{if(e.code=='F9'){PF.on^=1;e.preventDefault()}K[e.
 addEventListener('keyup',e=>K[e.code]=0);
 C.addEventListener('mousedown',e=>{e.button?M.r=1:M.l=1;if(!e.button){const q=cxy(e.clientX,e.clientY);menuPtr(q[0],q[1]);cutPtr(q[0],q[1])}e.preventDefault()});
 addEventListener('mouseup',e=>{e.button?M.r=0:M.l=0});
-C.addEventListener('mousemove',e=>{if(G.sc!='title'||G.go)return;const q=cxy(e.clientX,e.clientY),k=q[1]>370&&q[1]<426?0:q[1]>=426&&q[1]<470?1:-1;if(k>=0&&G.tm!=k){G.tm=k;AU.play('sfx_menu_hover')}});
+C.addEventListener('mousemove',e=>{if(G.sc!='title'||G.go||G.nj)return;const q=cxy(e.clientX,e.clientY),k=q[1]>370&&q[1]<422?0:q[1]>=422&&q[1]<458?1:q[1]>=458&&q[1]<496?2:-1;if(k>=0&&G.tm!=k){G.tm=k;AU.play('sfx_menu_hover')}});
 C.addEventListener('mousemove',e=>{if(G.sc=='dif'){const q=cxy(e.clientX,e.clientY),k=Math.floor((q[1]-150)/92);if(G.dst==0&&k>=0&&k<3&&G.dc!=k){G.dc=k;AU.play('sfx_menu_hover')}return}if(G.sc!='csel')return;const q=cxy(e.clientX,e.clientY),k=Math.floor((q[1]-204)/52);if(k>=0&&k<cselRows().length&&G.cc!=k){G.cc=k;AU.play('sfx_menu_hover')}});
 C.oncontextmenu=e=>e.preventDefault();
 function poll(){
@@ -2365,7 +2365,7 @@ function draw0(){
   l.forEach((t,k)=>tx(t,W/2,200+k*26,15,'#fff','center'));
   tx(G.pad?'🎮 Controle do Zé conectado! Aperte qualquer botão nele':'🎮 Ligue o controle e aperte um botão pro Zé entrar',W/2,310,17,G.pad?'#7aff9a':'#ffb',  'center');
   tx('Solo: Davi joga sozinho. No celular, use os botões da tela. O Zé entra quando apertar um botão do controle.',W/2,345,15,'#fff','center');
-  ['▶ Jogar','🧪 Modo Teste'].forEach((q,k)=>{const sel=G.tm==k;tx((sel?'➤ ':'')+q,W/2,405+k*42,sel?30:24,sel?'#ffd23a':'#fff','center',1)});tx('↑↓ escolhe · Enter / A confirma · toque 2x na opção — Modo Teste: arena neutra pra equipar e testar tudo',W/2,490,13,'#9cf','center');
+  ['▶ Jogar','🆕 Novo Jogo','🧪 Modo Teste'].forEach((q,k)=>{const sel=G.tm==k;tx((sel?'➤ ':'')+q,W/2,405+k*35,sel?28:22,sel?(k==1?'#ff9a9a':'#ffd23a'):'#fff','center',1)});tx('↑↓ escolhe · Enter / A confirma · toque 2x na opção — Novo Jogo: apaga todo o progresso',W/2,500,13,'#9cf','center');drNJ();
   if(G.go){const g=G.go;X.fillStyle='rgba(0,0,0,'+cl(.55+g.t*.5,0,.85)+')';X.fillRect(0,0,W,H);tx(g.s,W/2,H/2+8,28,'#fff','center',1);const a=cl((g.t-(g.max-.6))/.5,0,1);if(a>0){X.fillStyle='rgba(0,0,0,'+a+')';X.fillRect(0,0,W,H)}}
   return}
  X.save();X.translate(-G.cam+(G.sh>.3?Math.round(rnd(-1,1)*G.sh):0),-(G.cy||0)+(G.sh>.3?Math.round(rnd(-1,1)*G.sh*.6):0));
@@ -2961,8 +2961,9 @@ function upShop(dt){const L=shL();SF.forEach(f=>{f.t-=dt;if(NK[f.k]){f.x+=f.vx*d
 function update(dt){const s=G.sc;ambSX(s);shopTick(s,dt);
  if(s=='title'){AU.music(G.go?null:'mus_menu',G.go?1.5:1);
   if(G.go){const g=G.go;g.t+=dt;if((g.t>.4&&P.some(p=>p.on&&nv(p).ok))||g.t>=g.max)titleStart();return}
-  P.forEach(p=>{if(!p.on)return;const n=nv(p);if(n.u||n.d){G.tm=G.tm?0:1;AU.play('sfx_menu_hover')}});
-  if(!M.l&&P.some(p=>p.on&&nv(p).ok)){AU.play('sfx_menu_confirmar');if(G.tm){AU.music(null,.5);testStart()}else playGo()}}
+  if(G.nj){G.njt=Math.max(0,(G.njt||0)-dt);P.forEach(p=>{if(!p.on)return;const n=nv(p);if(n.u||n.d||n.l||n.r){G.njy^=1;AU.play('sfx_menu_hover')}if(pe(p,'pause')){G.nj=0;AU.play('sfx_menu_voltar')}});if(G.nj&&G.njt<=0&&!M.l&&P.some(p=>p.on&&nv(p).ok)){if(G.njy)njWipe();else{G.nj=0;AU.play('sfx_menu_voltar')}}return}
+  P.forEach(p=>{if(!p.on)return;const n=nv(p);if(n.u){G.tm=((G.tm|0)+2)%3;AU.play('sfx_menu_hover')}else if(n.d){G.tm=((G.tm|0)+1)%3;AU.play('sfx_menu_hover')}});
+  if(!M.l&&P.some(p=>p.on&&nv(p).ok)){AU.play('sfx_menu_confirmar');if(G.tm==2){AU.music(null,.5);testStart()}else if(G.tm==1)njOpen();else playGo()}}
  else if(s=='csel')upCsel(dt);else if(s=='dif')upDif(dt);else if(s=='load')upLoad(dt);else if(s=='play')upPlay(dt);else if(s=='pause')upPause();else if(s=='bag')upBag();else if(s=='tmenu')upTM();else if(s=='eqm')upEq();else if(s=='lvl')upLvl();else if(s=='shop')upShop(dt);else if(s=='missions')upMis(dt);else if(s=='cut')upCut(dt);else if(s=='fuga')upFuga(dt);else if(s=='c4tiro')upC4M(dt);else if(s=='c3run')upC3R(dt);
  else if(s=='over'){G.t+=dt;if(FX.length)FX=FX.filter(f=>(f.t-=dt)>0);if(!G.lbMs&&G.ch==5&&C5ST[G.c5e]&&C5ST[G.c5e].lj)c5LuOver();else if(G.t>1.2&&P.some(p=>p.on&&nv(p).ok)){if(G.lbAr)arDerrota();else if(G.lbMs)lbDerrota();else if(G.ch==5)retry5();else if(G.ch==4)retry4();else if(G.ch==3)retry3();else if(G.ch==2)retry2();else retry()}}
  else if(s=='win'&&P.some(p=>p.on&&nv(p).ok)){AU.play('sfx_menu_confirmar');lbEnter(G.ch==3?4:G.ch==2?3:2)}}
@@ -3084,11 +3085,19 @@ function drTitleBnr(){
  l.forEach((t,k)=>tx(t,W/2,16+k*17,13,'#fff','center',1));
  tx(G.pad?'🎮 Controle do Zé conectado! Aperte qualquer botão nele':'🎮 Ligue o controle e aperte um botão pro Zé entrar',W/2,86,14,G.pad?'#7aff9a':'#ffb','center',1);
  if(G.c1)tx(C5S.done?'✔ Capítulos 1, 2, 3, 4 e 5 concluídos':C4S.done?'✔ Capítulos 1, 2, 3 e 4 concluídos':C3S.done?'✔ Capítulos 1, 2 e 3 concluídos':C2S.done?'✔ Capítulos 1 e 2 concluídos':'✔ Capítulo 1 concluído',W/2,372,16,'#7aff9a','center',1);
- ['▶ Jogar','🧪 Modo Teste'].forEach((q,k)=>{const sel=G.tm==k;tx((sel?'➤ ':'')+q,W/2,405+k*42,sel?30:24,sel?'#ffd23a':'#fff','center',1)});
- tx('↑↓ escolhe · Enter / A confirma · toque 2x na opção — Modo Teste: arena neutra pra equipar e testar tudo',W/2,490,13,'#9cf','center',1);
- tx('Solo: Davi joga sozinho. No celular, use os botões da tela. O Zé entra quando apertar um botão do controle.',W/2,516,13,'#fff','center',1);
+ ['▶ Jogar','🆕 Novo Jogo','🧪 Modo Teste'].forEach((q,k)=>{const sel=G.tm==k;tx((sel?'➤ ':'')+q,W/2,405+k*35,sel?28:22,sel?(k==1?'#ff9a9a':'#ffd23a'):'#fff','center',1)});
+ tx('↑↓ escolhe · Enter / A confirma · toque 2x na opção — Novo Jogo: apaga todo o progresso · Modo Teste: arena neutra',W/2,498,13,'#9cf','center',1);
+ tx('Solo: Davi joga sozinho. No celular, use os botões da tela. O Zé entra quando apertar um botão do controle.',W/2,520,13,'#fff','center',1);
+ drNJ();
  if(G.go){const g=G.go;X.fillStyle='rgba(0,0,0,'+cl(.55+g.t*.5,0,.85)+')';X.fillRect(0,0,W,H);tx(g.s,W/2,H/2+8,28,'#fff','center',1);const a=cl((g.t-(g.max-.6))/.5,0,1);if(a>0){X.fillStyle='rgba(0,0,0,'+a+')';X.fillRect(0,0,W,H)}}
 }
+// ---------- NOVO JOGO (tela inicial): apaga todo o progresso salvo (capítulos, lobby, slots) e recarrega o jogo. Mantém só as configurações de desempenho. ----------
+function njOpen(){G.nj=1;G.njy=0;G.njt=.3;AU.play('sfx_menu_confirmar')}
+function njWipe(){try{const ks=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('zd_')==0&&k!='zd_perf'&&k!='zd_up'&&k!='zd_sm')ks.push(k)}ks.forEach(k=>localStorage.removeItem(k))}catch(e){}location.reload()}
+function drNJ(){if(!G.nj)return;X.save();X.setTransform(RS,0,0,RS,0,0);X.fillStyle='rgba(0,0,0,.82)';X.fillRect(0,0,W,H);
+ tx('🆕 NOVO JOGO?',W/2,170,44,'#ff9a9a','center',1);tx('Isso apaga TODO o progresso salvo (capítulos, lobby, itens, níveis).',W/2,222,20,'#fff','center',1);tx('Não dá pra desfazer. Dica: baixe o progresso (.json) nas configurações (O) antes.',W/2,252,15,'#ffd98a','center',1);
+ [['✔ SIM, APAGAR',250,'#ff7a7a'],['◀ NÃO, VOLTAR',490,'#7aff9a']].forEach(([l,x,c],i)=>{const sel=(G.njy|0)==(i==0?1:0);X.fillStyle=sel?'rgba(255,255,255,.22)':'rgba(255,255,255,.06)';X.beginPath();X.roundRect(x,340,220,56,14);X.fill();X.strokeStyle=c;X.lineWidth=sel?4:2;X.stroke();tx(l,x+110,376,22,c,'center',1)});
+ tx('←→ escolhe · Enter / A confirma · Esc / Start cancela',W/2,440,14,'#9cf','center',1);X.restore()}
 function titleGo(){const m=AU.man.nar_11;if(m&&AU.buf.nar_11){AU.play('nar_11');G.go={t:0,max:(m.d||3.2)+.6,s:m.txt||'Quando o país precisa de heróis... aparecem esses dois.'}}else titleStart()}
 // Jogar = continua de onde o jogador parou: capítulo em andamento -> continua na etapa; entre capítulos -> lobby (de lá segue pro próximo); sem progresso -> Cap. 1. Escolher capítulo livremente só no Modo Teste (treino).
 function playGo(){if(C5S.has&&!C5S.done)ldGo(5,c5Cont);else if(C4S.has&&!C4S.done)ldGo(4,c4Cont);else if(C3S.has&&!C3S.done)ldGo(3,c3Cont);else if(C2S.has&&!C2S.done)ldGo(2,c2Cont);else if(G.c1||C2S.done||C3S.done||C4S.done||C5S.done||C6S.done)lbCont();else ldGo(1,()=>{G.sc='title';titleGo()})}
@@ -3237,7 +3246,7 @@ function tmItems(){const k=TABK[TM.tab];if(k=='ms')return msItems();if(!/^(c[1-6
  let L=[];(k=='c5'||k=='c6'?[5,3,1,2,4,6]:[5,3,1,2,4]).forEach(t=>tmItemsRaw(t).forEach(it=>{if(chOf(it.l)==k)L.push(it)}));
  if(k=='c1'){const r=l=>{const m=l.match(/CS(\d+)/);return m?1+ +m[1]:0};L=L.map((it,i)=>[it,i]).sort((a,b)=>r(a[0].l)-r(b[0].l)||a[1]-b[1]).map(a=>a[0])}
  return L}
-function menuPtr(x,y){if(G.sc=='dif'){if(G.dst==0){const k=Math.floor((y-150)/92);if(k>=0&&k<3&&y<150+k*92+80)G.dc=k;else if(x>330&&x<630&&y>446&&y<490){G.dst=1;G.dy=0;G.cd=.25;AU.play('sfx_menu_confirmar')}}else if(y>380&&y<436){if(x>210&&x<460)dfStart();else if(x>500&&x<750){G.dst=0;G.cd=.25;AU.play('sfx_menu_voltar')}}return}if(G.sc=='csel'){const k=Math.floor((y-191)/46),R=cselRows();if(k>=0&&k<R.length){if(G.cc==k&&(G.cd||0)<=0){AU.play('sfx_menu_confirmar');R[k].f()}else G.cc=k}return}if(G.sc=='title'){if(G.go)return;const k=y>370&&y<426?0:y>=426&&y<470?1:-1;if(k>=0){if(G.tm==k){AU.play('sfx_menu_confirmar');if(k){AU.music(null,.5);testStart()}else playGo()}else G.tm=k}return}
+function menuPtr(x,y){if(G.sc=='dif'){if(G.dst==0){const k=Math.floor((y-150)/92);if(k>=0&&k<3&&y<150+k*92+80)G.dc=k;else if(x>330&&x<630&&y>446&&y<490){G.dst=1;G.dy=0;G.cd=.25;AU.play('sfx_menu_confirmar')}}else if(y>380&&y<436){if(x>210&&x<460)dfStart();else if(x>500&&x<750){G.dst=0;G.cd=.25;AU.play('sfx_menu_voltar')}}return}if(G.sc=='csel'){const k=Math.floor((y-191)/46),R=cselRows();if(k>=0&&k<R.length){if(G.cc==k&&(G.cd||0)<=0){AU.play('sfx_menu_confirmar');R[k].f()}else G.cc=k}return}if(G.sc=='title'){if(G.go)return;if(G.nj){if(y>330&&y<410){if(x>250&&x<470){G.njy=1;if(G.njt<=0)njWipe()}else if(x>490&&x<710){G.njy=0;G.nj=0;AU.play('sfx_menu_voltar')}}return}const k=y>370&&y<422?0:y>=422&&y<458?1:y>=458&&y<496?2:-1;if(k>=0){if(G.tm==k){AU.play('sfx_menu_confirmar');if(k==2){AU.music(null,.5);testStart()}else if(k==1)njOpen();else playGo()}else G.tm=k}return}
  if(G.sc!='tmenu'||x<12||x>12+TW)return;TM.skip=1;
  if(y>=48&&y<=74){TM.tab=cl(Math.floor((x-12)/(TW/TABS.length)),0,TABS.length-1);TM.cur=0;return}
  if(y>=486&&y<=514){tmPg(x<12+TW/2?-1:1);return}
