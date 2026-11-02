@@ -44,6 +44,7 @@ addEventListener('DOMContentLoaded',()=>{const b=document.getElementById('inst')
 const C=document.getElementById('c'),X=C.getContext('2d',{alpha:false}),W=960,H=540,CF=document.getElementById('cfg');
 // ---------- [CFG] modo desempenho + ajuste de tela ----------
 let RS=1,PERF=0,SM=0,UP=0,PF0=0;
+try{if(/[?&]novojogo/.test(location.search)){const ks=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('zd_')==0&&k!='zd_perf'&&k!='zd_up'&&k!='zd_sm')ks.push(k)}ks.forEach(k=>localStorage.removeItem(k));history.replaceState(null,'',location.pathname)}}catch(e){}
 try{PF0=+localStorage.getItem('zd_perf')||0;UP=+localStorage.getItem('zd_up')||0;SM=+localStorage.getItem('zd_sm')||0}catch(e){}
 PERF=(PF0||UP)?1:0;
 const GBG=document.getElementById('bgf'),GBX=GBG.getContext('2d',{alpha:false});let gbN=0;
@@ -3093,7 +3094,8 @@ function drTitleBnr(){
 }
 // ---------- NOVO JOGO (tela inicial): apaga todo o progresso salvo (capítulos, lobby, slots) e recarrega o jogo. Mantém só as configurações de desempenho. ----------
 function njOpen(){G.nj=1;G.njy=0;G.njt=.3;AU.play('sfx_menu_confirmar')}
-function njWipe(){try{const ks=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('zd_')==0&&k!='zd_perf'&&k!='zd_up'&&k!='zd_sm')ks.push(k)}ks.forEach(k=>localStorage.removeItem(k))}catch(e){}location.reload()}
+function zdWipeKeys(){try{const ks=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('zd_')==0&&k!='zd_perf'&&k!='zd_up'&&k!='zd_sm')ks.push(k)}ks.forEach(k=>localStorage.removeItem(k))}catch(e){}try{sessionStorage.clear()}catch(e){}}
+function njWipe(){if(G.njx)return;G.njx=1;zdWipeKeys();const go=()=>{try{location.replace(location.pathname+'?novo='+Date.now())}catch(e){location.reload()}};let n=0;const fin=()=>{if(++n>=2)go()};try{if(window.caches)caches.keys().then(ks=>Promise.all(ks.map(k=>caches.delete(k)))).then(fin,fin);else fin()}catch(e){fin()}try{if(navigator.serviceWorker)navigator.serviceWorker.getRegistrations().then(rs=>Promise.all(rs.map(r=>r.unregister()))).then(fin,fin);else fin()}catch(e){fin()}setTimeout(go,2500)}
 function drNJ(){if(!G.nj)return;X.save();X.setTransform(RS,0,0,RS,0,0);X.fillStyle='rgba(0,0,0,.82)';X.fillRect(0,0,W,H);
  tx('🆕 NOVO JOGO?',W/2,170,44,'#ff9a9a','center',1);tx('Isso apaga TODO o progresso salvo (capítulos, lobby, itens, níveis).',W/2,222,20,'#fff','center',1);tx('Não dá pra desfazer. Dica: baixe o progresso (.json) nas configurações (O) antes.',W/2,252,15,'#ffd98a','center',1);
  [['✔ SIM, APAGAR',250,'#ff7a7a'],['◀ NÃO, VOLTAR',490,'#7aff9a']].forEach(([l,x,c],i)=>{const sel=(G.njy|0)==(i==0?1:0);X.fillStyle=sel?'rgba(255,255,255,.22)':'rgba(255,255,255,.06)';X.beginPath();X.roundRect(x,340,220,56,14);X.fill();X.strokeStyle=c;X.lineWidth=sel?4:2;X.stroke();tx(l,x+110,376,22,c,'center',1)});
